@@ -1,0 +1,417 @@
+[
+    {
+        "IATA":"BSB",
+        "ICAO":"SBBR",
+        "Nome do Aeroporto":"Aeroporto Internacional de Brasília \/ Presidente Jucelino Kubitschek",
+        "Cidade":"Brasília",
+        "UF":"DF",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"CGH",
+        "ICAO":"SBSP",
+        "Nome do Aeroporto":"Aeroporto Internacional de São Paulo \/ Congonhas",
+        "Cidade":"São Paulo",
+        "UF":"SP",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"GIG",
+        "ICAO":"SBGL",
+        "Nome do Aeroporto":"Aeroporto Internacional do Rio de Janeiro \/ Galeão-Antônio Carlos Jobim",
+        "Cidade":"Rio de Janeiro",
+        "UF":"RJ",
+        "Pais":"Brasil"},
+    {
+        "IATA":"SSA",
+        "ICAO":"SBSV",
+        "Nome do Aeroporto":"Aeroporto Internacional de Salvador \/ Deputado Luis Eduardo Magalhães",
+        "Cidade":"Salvador",
+        "UF":"BA",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"FLN",
+        "ICAO":"SBFL",
+        "Nome do Aeroporto":"Aeroporto Internacional de Florianópolis \/ Hercílio Luz",
+        "Cidade":"Florianópolis",
+        "UF":"SC",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"POA",
+        "ICAO":"SBPA",
+        "Nome do Aeroporto":"Aeroporto Internacional de Porto Alegre \/ Salgado Filho",
+        "Cidade":"Porto Alegre",
+        "UF":"RS",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"VCP",
+        "ICAO":"SBKP",
+        "Nome do Aeroporto":"Aeroporto Internacional de Viracopos \/ Campinas",
+        "Cidade":"Campinas",
+        "UF":"SP",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"REC",
+        "ICAO":"SBRF",
+        "Nome do Aeroporto":"Aeroporto Internacional do Recife\/ Guararapes – Gilberto Freyre",
+        "Cidade":"Recife",
+        "UF":"PE",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"CWB",
+        "ICAO":"SBCT",
+        "Nome do Aeroporto":"Aeroporto Internacional de Curitiba \/ Afonso Pena",
+        "Cidade":"Curitiba",
+        "UF":"PR",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"BEL",
+        "ICAO":"SBBE",
+        "Nome do Aeroporto":"Aeroporto Internacional de Belém \/ Val de Cans",
+        "Cidade":"Belém",
+        "UF":"PA",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"VIX",
+        "ICAO":"SBVT",
+        "Nome do Aeroporto":"Aeroporto de Vitória – Eurico de Aguiar Salles",
+        "Cidade":"Vitória",
+        "UF":"ES",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"SDU",
+        "ICAO":"SBRJ",
+        "Nome do Aeroporto":"Aerorporto Santos Dumont",
+        "Cidade":"Rio de Janeiro",
+        "UF":"RJ",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"CGB",
+        "ICAO":"SBCY",
+        "Nome do Aeroporto":"Aeroporto Internacional de Cuiabá \/ Marechal Rondon",
+        "Cidade":"Cuiabá",
+        "UF":"MT",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"CGR",
+        "ICAO":"SBCG",
+        "Nome do Aeroporto":"Aeroporto Internacional de Campo Grande",
+        "Cidade":"Campo Grande",
+        "UF":"MS",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"FOR",
+        "ICAO":"SBFZ",
+        "Nome do Aeroporto":"Aeroporto Internacional de Fortaleza \/ Pinto Martins",
+        "Cidade":"Fortaleza",
+        "UF":"CE",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"MCP",
+        "ICAO":"SBMQ",
+        "Nome do Aeroporto":"Aeroporto Internacional de Macapá",
+        "Cidade":"Macapá",
+        "UF":"AP",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"MGF",
+        "ICAO":"SBMG",
+        "Nome do Aeroporto":"Aeroporto Regional de Maringá \/ Silvio Name Junior",
+        "Cidade":"Maringá",
+        "UF":"PR",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"GYN",
+        "ICAO":"SBGO",
+        "Nome do Aeroporto":"Aeroporto de Goiânia \/ Santa Genoveva",
+        "Cidade":"Goiânia",
+        "UF":"GO",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"NVT",
+        "ICAO":"SBNF",
+        "Nome do Aeroporto":"Aeroporto Internacional de Navegantes \/ Ministro Victor Konder",
+        "Cidade":"Navegantes",
+        "UF":"SC",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"MAO",
+        "ICAO":"SBEG",
+        "Nome do Aeroporto":"Aeroporto Internacional de Manaus \/ Eduardo Gomes",
+        "Cidade":"Manaus",
+        "UF":"AM",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"NAT",
+        "ICAO":"SBNT",
+        "Nome do Aeroporto":"Aeroporto Internacional de Natal \/ Augusto Severo",
+        "Cidade":"Natal",
+        "UF":"RN",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"BPS",
+        "ICAO":"SBPS",
+        "Nome do Aeroporto":"Aeroporto Internacional de Porto Seguro",
+        "Cidade":"Porto Seguro",
+        "UF":"BA",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"MCZ",
+        "ICAO":"SBMO",
+        "Nome do Aeroporto":"Aeroporto de Maceió \/ Zumbi dos Palmares",
+        "Cidade":"Maceió",
+        "UF":"AL",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"PMW",
+        "ICAO":"SSPS",
+        "Nome do Aeroporto":"Aeroporto de Palmas\/Brigadeiro Lysias Rodrigues",
+        "Cidade":"Palmas",
+        "UF":"TO",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"SLZ",
+        "ICAO":"SBSL",
+        "Nome do Aeroporto":"Aeroporto Internacional de São Luís \/ Marechal Cunha Machado",
+        "Cidade":"São Luis",
+        "UF":"MA",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"GRU",
+        "ICAO":"SBGR",
+        "Nome do Aeroporto":"Aeroporto Internacional de São Paulo\/Guarulhos-Governador André Franco Motoro",
+        "Cidade":"Guarulhos",
+        "UF":"SP",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"LDB",
+        "ICAO":"SBLO",
+        "Nome do Aeroporto":"Aeroporto de Londrina \/ Governador José Richa",
+        "Cidade":"Londrina",
+        "UF":"PR",
+        "Pais":"Brasil"
+     },
+    {
+        "IATA":"PVH",
+        "ICAO":"SBPV",
+        "Nome do Aeroporto":"Aeroporto Internacional de Porto Velho \/ Governador Jorge Teixeira de Oliveira",
+        "Cidade":"Porto Velho",
+        "UF":"RO",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"RBR",
+        "ICAO":"SBRB",
+        "Nome do Aeroporto":"Aeroporto Internacional de Rio Branco \/ Plácido de Castro",
+        "Cidade":"Rio Branco",
+        "UF":"AC",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"JOI",
+        "ICAO":"SBJV",
+        "Nome do Aeroporto":"Aeroporto de Joinville \/ Lauro Carneiro de Loyola",
+        "Cidade":"Joinville",
+        "UF":"SC",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"UDI",
+        "ICAO":"SBUL",
+        "Nome do Aeroporto":"Aeroporto de Uberlândia \/ Ten. Cel. Av. César Bombonato",
+        "Cidade":"Uberlândia",
+        "UF":"MG",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"CXJ",
+        "ICAO":"SBCX",
+        "Nome do Aeroporto":"Aeroporto Regional de Caxias do Sul \/ Hugo Cantergiani",
+        "Cidade":"Caxias do Sul",
+        "UF":"RS",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"IGU",
+        "ICAO":"SBFI",
+        "Nome do Aeroporto":"Aeroporto Internacional de Foz do Iguaçu",
+        "Cidade":"Foz do Iguaçu",
+        "UF":"PR",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"THE",
+        "ICAO":"SBTE",
+        "Nome do Aeroporto":"Aeroporto de Teresina – Senador Petrônio Portella",
+        "Cidade":"Teresina",
+        "UF":"PI",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"AJU",
+        "ICAO":"SBAR",
+        "Nome do Aeroporto":"Aeroporto Internacional de Aracaju \/ Santa Maria",
+        "Cidade":"Aracaju",
+        "UF":"SE",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"JPA",
+        "ICAO":"SBJP",
+        "Nome do Aeroporto":"Aeroporto Internacional de João Pessoa \/ Presidente Castro Pinto",
+        "Cidade":"João Pessoa",
+        "UF":"PB",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"PNZ",
+        "ICAO":"SBPL",
+        "Nome do Aeroporto":"Aeroporto de Petrolina \/ Senador Nilo Coelho",
+        "Cidade":"Petrolina",
+        "UF":"PE",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"CNF",
+        "ICAO":"SBCF",
+        "Nome do Aeroporto":"Aeroporto Internacional de Minas Gerais \/ Confins – Tancredo Neves",
+        "Cidade":"Confins",
+        "UF":"MG",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"BVB",
+        "ICAO":"SBBV",
+        "Nome do Aeroporto":"Aeroporto Internacional de Boa Vista \/ Atlas Brasil Cantanhede",
+        "Cidade":"Boa Vista",
+        "UF":"RR",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"CPV",
+        "ICAO":"SBKG",
+        "Nome do Aeroporto":"Aeroporto de Campina Grande \/ Presidente João Suassuna",
+        "Cidade":"Campina Grande",
+        "UF":"PB",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"STM",
+        "ICAO":"SBSN",
+        "Nome do Aeroporto":"Aeroporto de Santarém \/ Maestro Wilson Fonseca",
+        "Cidade":"Santarém",
+        "UF":"PA",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"IOS",
+        "ICAO":"SBIL",
+        "Nome do Aeroporto":"Aeroporto de Ilhéus\/Bahia-Jorge Amado",
+        "Cidade":"Ilhéus",
+        "UF":"BA",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"JDO",
+        "ICAO":"SBJU",
+        "Nome do Aeroporto":"Aeroporto de Juazeiro do Norte – Orlando Bezerra",
+        "Cidade":"Juazeiro do Norte",
+        "UF":"CE",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"IMP",
+        "ICAO":"SBIZ",
+        "Nome do Aeroporto":"Aeroporto de Imperatriz – Prefeito Renato Moreira",
+        "Cidade":"Imperatriz",
+        "UF":"MA",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"XAP",
+        "ICAO":"SBCH",
+        "Nome do Aeroporto":"Aeroporto de Chapecó – Serafin Enoss Bertaso",
+        "Cidade":"Chapecó",
+        "UF":"SC",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"MAB",
+        "ICAO":"SBMA",
+        "Nome do Aeroporto":"Aeroporto de Marabá",
+        "Cidade":"Marabá",
+        "UF":"PA",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"CZS",
+        "ICAO":"SBCZ",
+        "Nome do Aeroporto":"Aeroporto Internacional de Cruzeiro do Sul",
+        "Cidade":"Cruzeiro do Sul",
+        "UF":"AC",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"PPB",
+        "ICAO":"SBDN",
+        "Nome do Aeroporto":"Aeroporto Estadual de Presidente Prudente",
+        "Cidade":"Presidente Prudente",
+        "UF":"SP",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"CFB",
+        "ICAO":"SBCB",
+        "Nome do Aeroporto":"Aeroporto Internacional de Cabo Frio",
+        "Cidade":"Cabo Frio",
+        "UF":"RJ",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"FEN",
+        "ICAO":"SBFN",
+        "Nome do Aeroporto":"Aeroporto de Fernando de Noronha",
+        "Cidade":"Fernando de Noronha",
+        "UF":"PE",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"JTC",
+        "ICAO":"SJTC",
+        "Nome do Aeroporto":"Aeroporto Estadual de Bauru\/Arealva",
+        "Cidade":"Bauru",
+        "UF":"SP",
+        "Pais":"Brasil"
+    },
+    {
+        "IATA":"MOC",
+        "ICAO":"SBMK",
+        "Nome do Aeroporto":"Aeroporto de Montes Claros\/Mário Ribeiro",
+        "Cidade":"Montes Claros",
+        "UF":"MG",
+        "Pais":"Brasil"
+    }
+]

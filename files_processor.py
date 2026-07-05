@@ -7,21 +7,6 @@ import os
 # import numpy 
 import pandas
 
-# def weighted_avg_and_std(values, weights):
-#     import math
-#     """
-#     Return the weighted average and standard deviation.
-
-#     They weights are in effect first normalized so that they 
-#     sum to 1 (and so they must not all be 0).
-
-#     values, weights -- NumPy ndarrays with the same shape.
-#     """
-#     average = numpy.average(values, weights=weights)
-#     # Fast and numerically precise:
-#     variance = numpy.average((values-average)**2, weights=weights)
-#     return (average, math.sqrt(variance))
-
 class FilesProcessor:
     def __init__(self):
         import json
@@ -75,21 +60,38 @@ class FilesProcessor:
         df["Fare"] = pandas.to_numeric(df["Fare"], errors='coerce')
         return df
     
-    def create_metrics_file(self, df):
+    @staticmethod
+    def weighted_average(values, weights):
+        """Returns the average of values weighted by weights (e.g. Seats)."""
+        return (values * weights).sum() / weights.sum()
+
+    @staticmethod
+    def weighted_std(values, weights):
+        """
+        Returns the standard deviation of values weighted by weights, treating
+        weights as frequency weights (e.g. Seats represents repeated observations
+        of the same fare), using the unbiased frequency-weights estimator.
+        """
+        average = FilesProcessor.weighted_average(values, weights)
+        variance = (weights * (values - average) ** 2).sum() / (weights.sum() - 1)
+        return variance ** 0.5
+
+    def create_metrics_file(self, df, filename="fare_metrics_by_year.csv"):
         """
         Calculates the weighted average fare, weighted standard deviation and total seats for each route and month
-        considering seats as weights for the average fare and standard deviation.
+        considering seats as weights for the average fare and standard deviation, and saves the result to a CSV file.
         """
         # transform the RouteAgg column to string to avoid issues with list comparison during groupby
         df["RouteAgg"] = df["RouteAgg"].apply(lambda x: ' >> '.join(x) if isinstance(x, list) else x)
-        # TODO: review std dev weighted calculation
         metrics = df.groupby(['RouteAgg', 'Route', 'YearMonth']).apply(lambda x: pandas.Series({
-            'WeightedAverageFare': (x['Fare'] * x['Seats']).sum() / x['Seats'].sum(),
-            'FareStdDev': x['Fare'].std(),
+            'WeightedAverageFare': self.weighted_average(x['Fare'], x['Seats']),
+            'FareStdDev': self.weighted_std(x['Fare'], x['Seats']),
             'TotalSeats': x['Seats'].sum()
         })).reset_index()
 
-        # metrics.to_csv("airline_metrics.csv", index=False)
+        path_to_file = os.getcwd() + "/" + filename
+        metrics.to_csv(path_to_file, index=False)
+        return metrics
 
     def save_cleaned_dataframe(self, df, filename="cleaned_airline_prices.csv"):
         """Saves the cleaned dataframe to a CSV file."""
@@ -100,17 +102,6 @@ class FilesProcessor:
         df = self.clean_dataframe(df)
         df = self.route_agg_column(df)
         df = self.convert_fare_to_numeric(df)
-        # self.create_metrics_file(df)
+        metrics = self.create_metrics_file(df)
         # self.save_cleaned_dataframe(df)
-        return df
-    
-
-# class WeightedStatistics:
-#     def __init__(self):
-#         import pandas
-#         import numpy
-#         from scipy.stats.mstats import weightedquantile  # For weighted quantiles  
-
-
-    
-# # https://www.ancisoft.com/blog/using-describe-with-weighted-data-mean-standard-deviation-median-quantiles/
+        return df, metrics

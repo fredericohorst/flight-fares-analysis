@@ -39,17 +39,14 @@ class FilesProcessor:
         return df
     
     def route_agg_column(self, df):
-        """Creates a RouteAgg column that aggregates routes in both directions."""
+        """Creates a RouteAgg column that aggregates routes in both directions using a canonical, order-independent key."""
         routes = df["Route"].unique()
         dict_RouteAgg = []
-        RouteAgg = []
         for route in routes:
             x = str(route).split(" >> ")
             if x != ['nan', 'nan'] and x != ['nan']:
-                route_invert =  f"{x[1]} >> {x[0]}"
-                route_complete = [route, route_invert]
-                RouteAgg.append(route_complete)
-                dict_RouteAgg.append({"Route": route, "RouteAgg": route_complete})
+                route_agg = " >> ".join(sorted(x))
+                dict_RouteAgg.append({"Route": route, "RouteAgg": route_agg})
         df_RouteAgg = pandas.DataFrame(dict_RouteAgg)
         df = df.merge(df_RouteAgg, left_on='Route', right_on='Route', how='left')
         return df
@@ -81,17 +78,69 @@ class FilesProcessor:
         Calculates the weighted average fare, weighted standard deviation and total seats for each route and month
         considering seats as weights for the average fare and standard deviation, and saves the result to a CSV file.
         """
-        # transform the RouteAgg column to string to avoid issues with list comparison during groupby
-        df["RouteAgg"] = df["RouteAgg"].apply(lambda x: ' >> '.join(x) if isinstance(x, list) else x)
         metrics = df.groupby(['RouteAgg', 'Route', 'YearMonth']).apply(lambda x: pandas.Series({
             'WeightedAverageFare': self.weighted_average(x['Fare'], x['Seats']),
             'FareStdDev': self.weighted_std(x['Fare'], x['Seats']),
             'TotalSeats': x['Seats'].sum()
         })).reset_index()
+        # scale-invariant, so it's the same whether computed on nominal or deflated fares
+        metrics['CoefficientVariation'] = metrics['FareStdDev'] / metrics['WeightedAverageFare']
 
-        path_to_file = os.getcwd() + "/" + filename
+        path_to_file = os.getcwd() + "/metrics_files/" + filename
         metrics.to_csv(path_to_file, index=False)
         return metrics
+
+    def read_ipca(self, path="ipca_historico.csv"):
+        """Reads the IPCA historical series and returns it as YearMonth + Index columns."""
+        ipca = pandas.read_csv(path, delimiter=';', encoding='utf-8')
+        ipca = ipca.rename(columns={
+            "Período": "YearMonth",
+            "Número Índice (Dez/93 = 100)": "IPCAIndex"
+        })
+        ipca["YearMonth"] = ipca["YearMonth"].astype(str).str[:4] + "-" + ipca["YearMonth"].astype(str).str[4:]
+        return ipca[["YearMonth", "IPCAIndex"]]
+
+    def deflate_metrics(self, metrics, base_yearmonth=None, filename="fare_metrics_by_year_deflated.csv"):
+        """
+        Deflates WeightedAverageFare and FareStdDev to constant prices using the IPCA index,
+        expressing every fare in terms of the purchasing power of base_yearmonth (defaults to
+        the most recent month present in metrics). FareStdDev is deflated by the same factor
+        as the average since it shares the same currency units; TotalSeats is left untouched.
+        """
+        ipca = self.read_ipca()
+        if base_yearmonth is None:
+            base_yearmonth = metrics["YearMonth"].max()
+        base_index = ipca.loc[ipca["YearMonth"] == base_yearmonth, "IPCAIndex"].iloc[0]
+
+        metrics = metrics.merge(ipca, on="YearMonth", how="left")
+        deflation_factor = base_index / metrics["IPCAIndex"]
+        metrics["WeightedAverageFareReal"] = metrics["WeightedAverageFare"] * deflation_factor
+        metrics["FareStdDevReal"] = metrics["FareStdDev"] * deflation_factor
+
+        path_to_file = os.getcwd() + "/metrics_files/" + filename
+        metrics.to_csv(path_to_file, index=False)
+        return metrics
+
+    def summarize_route_variability(self, metrics, filename="route_fare_variability.csv"):
+        """
+        Summarizes real (inflation-adjusted) fare variability per route across the whole
+        period available, weighting each month's fare by its seat volume. This captures how
+        much fares actually moved over time for a route, as opposed to FareStdDev/
+        CoefficientVariation in the metrics file, which only describe within-month dispersion.
+        """
+        summary = metrics.groupby('RouteAgg').apply(lambda x: pandas.Series({
+            'AverageFareReal': self.weighted_average(x['WeightedAverageFareReal'], x['TotalSeats']),
+            'FareRealStdDev': self.weighted_std(x['WeightedAverageFareReal'], x['TotalSeats']),
+            'MinFareReal': x['WeightedAverageFareReal'].min(),
+            'MaxFareReal': x['WeightedAverageFareReal'].max(),
+            'MonthsAvailable': x['YearMonth'].nunique(),
+            'TotalSeats': x['TotalSeats'].sum()
+        })).reset_index()
+        summary['CoefficientVariation'] = summary['FareRealStdDev'] / summary['AverageFareReal']
+
+        path_to_file = os.getcwd() + "/metrics_files/" + filename
+        summary.to_csv(path_to_file, index=False)
+        return summary
 
     def save_cleaned_dataframe(self, df, filename="cleaned_airline_prices.csv"):
         """Saves the cleaned dataframe to a CSV file."""
@@ -103,5 +152,7 @@ class FilesProcessor:
         df = self.route_agg_column(df)
         df = self.convert_fare_to_numeric(df)
         metrics = self.create_metrics_file(df)
+        metrics = self.deflate_metrics(metrics)
+        route_variability = self.summarize_route_variability(metrics)
         # self.save_cleaned_dataframe(df)
-        return df, metrics
+        return df, metrics, route_variability

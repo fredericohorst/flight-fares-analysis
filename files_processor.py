@@ -4,36 +4,81 @@
 
 import glob
 import os
-# import numpy 
+import unicodedata
+# import numpy
 import pandas
 
 class FilesProcessor:
+    CANONICAL_COLUMNS = ["Year", "Month", "Airline", "OriginICAO", "DestinationICAO", "Fare", "Seats"]
+
+    # ANAC has changed the CSV header schema several times across the historical series
+    # (e.g. ANO vs. "Ano de Referência" vs. nr_ano_referencia); every known variant is
+    # mapped onto CANONICAL_COLUMNS here, keyed by an accent-stripped, lowercased header.
+    COLUMN_ALIASES = {
+        'ano': 'Year', 'ano de referencia': 'Year', 'nr_ano_referencia': 'Year',
+        'mes': 'Month', 'mes de referencia': 'Month', 'nr_mes_referencia': 'Month',
+        'empresa': 'Airline', 'icao empresa aerea': 'Airline', 'sg_empresa_icao': 'Airline',
+        'origem': 'OriginICAO', 'icao aerodromo origem': 'OriginICAO', 'sg_icao_origem': 'OriginICAO',
+        'destino': 'DestinationICAO', 'icao aerodromo destino': 'DestinationICAO', 'sg_icao_destino': 'DestinationICAO',
+        'tarifa': 'Fare', 'tarifa-n': 'Fare', 'nr_tarifa': 'Fare',
+        'assentos': 'Seats', 'assentos comercializados': 'Seats', 'nr_assentos': 'Seats',
+    }
+
     def __init__(self):
         import json
         self.path = os.getcwd() + "/csv_files_from_anac/"
         self.dict_airports = json.load(open("airports.json", encoding='utf-8'))
         self.dict_airports = pandas.DataFrame(self.dict_airports)
 
+    @staticmethod
+    def _strip_accents(text):
+        return ''.join(c for c in unicodedata.normalize('NFKD', text) if not unicodedata.combining(c))
+
+    @classmethod
+    def _normalize_columns(cls, df, source_file):
+        """Renames a raw ANAC file's columns to CANONICAL_COLUMNS regardless of which
+        header schema it was downloaded with, and drops any stray extra columns (e.g. a
+        leftover row-index column present in a few files)."""
+        rename = {}
+        for col in df.columns:
+            key = cls._strip_accents(str(col)).strip().strip('"').lower()
+            if key in cls.COLUMN_ALIASES:
+                rename[col] = cls.COLUMN_ALIASES[key]
+        if sorted(rename.values()) != sorted(cls.CANONICAL_COLUMNS):
+            raise ValueError(f"{source_file}: unrecognized column schema {list(df.columns)}")
+        return df.rename(columns=rename)[cls.CANONICAL_COLUMNS]
+
+    @staticmethod
+    def _read_single_file(path):
+        # most files are Latin-1; a few were re-exported as UTF-8 with a BOM
+        try:
+            return pandas.read_csv(path, delimiter=';', encoding='utf-8-sig')
+        except UnicodeDecodeError:
+            return pandas.read_csv(path, delimiter=';', encoding='latin-1')
+
     def read_files(self):
-        df = pandas.concat((pandas.read_csv(f, delimiter=';', encoding='latin-1') for f in glob.glob(self.path + "*.CSV")), ignore_index=True)
+        frames = []
+        for f in sorted(glob.glob(self.path + "*.CSV")):
+            frame = self._read_single_file(f)
+            frames.append(self._normalize_columns(frame, f))
+        df = pandas.concat(frames, ignore_index=True)
         return df
-        
+
     def clean_dataframe(self, df):
-        """Cleans the dataframe by renaming columns and creating a YearMonth column."""
-        # rename columns for better readability
-        df.columns = ["Year", "Month", "Airline", "OriginICAO", "DestinationICAO", "Fare", "Seats"]
+        """Cleans the dataframe by creating a YearMonth column and enriching with airport names."""
         # create a YearMonth column for easier time series analysis
         df["YearMonth"] = df["Year"].astype(str) + "-" + df["Month"].astype(str).str.zfill(2)
-        # merge with airports data to get city names
+        # merge with airports data to get city names (airports.json only covers a subset of
+        # the ICAO codes seen in the fare data, so this enrichment can be NaN for a given row)
         df = df.merge(self.dict_airports[['ICAO', 'Nome do Aeroporto', "IATA"]], left_on='OriginICAO', right_on='ICAO', how='left')
         df = df.rename(columns={'Nome do Aeroporto': 'OriginCity', "IATA": "Origin"})
         df = df.merge(self.dict_airports[['ICAO', 'Nome do Aeroporto', "IATA"]], left_on='DestinationICAO', right_on='ICAO', how='left')
         df = df.rename(columns={'Nome do Aeroporto': 'DestinationCity', "IATA": "Destination"})
         df = df.drop(columns=['ICAO_x', 'ICAO_y'])
-        # create Route column for better analysis
-        df["Route"] = df["Origin"] + " >> " + df["Destination"]
-        # make sure Route is string for better analysis
-        df["Route"] = df["Route"].astype(str)
+        # build Route from the IATA code where airports.json has it, falling back to the ICAO
+        # code otherwise, so route identity never depends on airports.json's coverage and no
+        # fare data is silently dropped for airports it doesn't list
+        df["Route"] = df["Origin"].fillna(df["OriginICAO"]) + " >> " + df["Destination"].fillna(df["DestinationICAO"])
         # order dataframe by Year and Month
         df = df.sort_values(by=["Year", "Month"]).reset_index(drop=True)
         return df
@@ -52,8 +97,11 @@ class FilesProcessor:
         return df
 
     def convert_fare_to_numeric(self, df):
-        """Converts the Fare column to numeric, handling commas as decimal separators."""
-        df["Fare"] = df["Fare"].str.replace(",", ".")  # Replace comma with dot for decimal
+        """Converts the Fare column to numeric, handling comma-decimal strings (most files)
+        as well as already-numeric values (some months' files use period decimals or plain
+        integers instead of commas, which makes pandas infer that single file's Fare column
+        as numeric before concatenation)."""
+        df["Fare"] = df["Fare"].astype(str).str.replace(",", ".")  # Replace comma with dot for decimal
         df["Fare"] = pandas.to_numeric(df["Fare"], errors='coerce')
         return df
     

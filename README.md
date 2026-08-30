@@ -14,7 +14,10 @@ regulator) historical fare series, adjusted for inflation using IBGE's IPCA inde
 ## Data Sources
 
 - **Historical air fares** by origin, destination and airline: [ANAC downloads](https://sistemas.anac.gov.br/sas/downloads/view/frmDownload.aspx)
-- **IPCA historical series** (Brazilian consumer price index, used to deflate fares to real values): [IBGE](https://www.ibge.gov.br/estatisticas/economicas/precos-e-custos/9256-indice-nacional-de-precos-ao-consumidor-amplo.html?=&t=series-historicas)
+- **IPCA series** (Brazilian consumer price index, used to deflate fares to real values): fetched
+  live from the [BCB SGS API](https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados) (series 433,
+  IPCA monthly % variation) via the shared [`br_economic_indicators`](https://github.com/fredericohorst/br-economic-indicators)
+  package — no local IPCA file is kept, so deflated values always reflect the latest published index.
 - More context on the fare data: [ANAC air transport market statistics](https://www.anac.gov.br/assuntos/dados-e-estatisticas/mercado-do-transporte-aereo)
 
 ## Goals
@@ -32,7 +35,6 @@ regulator) historical fare series, adjusted for inflation using IBGE's IPCA inde
 files_processor.py        # FilesProcessor: the full cleaning/aggregation pipeline
 airline_prices.ipynb       # notebook entry point that runs the pipeline and explores results
 airports.json               # ICAO/IATA/city lookup used to enrich routes with names
-ipca_historico.csv           # IBGE IPCA historical index (inflation)
 csv_files_from_anac/          # raw monthly ANAC fare CSVs (not versioned, see Setup)
 metrics_files/                  # generated output CSVs (not versioned, see Output files)
 ```
@@ -41,6 +43,7 @@ metrics_files/                  # generated output CSVs (not versioned, see Outp
 
 ```bash
 pip install -r requirements.txt
+pip install -e /path/to/br-economic-indicators  # shared deflation/indicators package
 ```
 
 Download the monthly historical fare CSVs from ANAC and place them in `csv_files_from_anac/`.
@@ -73,8 +76,10 @@ df, metrics, route_variability = FilesProcessor().process_files()
    or plain integers instead).
 5. **`create_metrics_file`** — computes the seats-weighted average fare, weighted standard
    deviation and coefficient of variation per route/month; saves `fare_metrics_by_year.csv`.
-6. **`deflate_metrics`** — joins the IPCA index and expresses fares in constant (most recent
-   month's) purchasing power; saves `fare_metrics_by_year_deflated.csv`.
+6. **`deflate_metrics`** — fetches the IPCA index live via `br_economic_indicators` and expresses
+   fares in constant (most recent month's) purchasing power; if that month is more recent than the
+   latest published IPCA observation, the last available index value is held flat rather than
+   failing; saves `fare_metrics_by_year_deflated.csv`.
 7. **`summarize_route_variability`** — aggregates across the whole period, per route, to show
    how much real fares actually moved over time; saves `route_fare_variability.csv`.
 
@@ -90,7 +95,8 @@ df, metrics, route_variability = FilesProcessor().process_files()
 
 > Note on methodology: seats are treated as frequency weights (each seat represents a repeated
 > observation of that fare), so standard deviations use the unbiased frequency-weighted
-> estimator, not a population-weighted one. Confidence intervals were considered but ruled out
+> estimator, not a population-weighted one — except for a route/month with a single seat sold,
+> which has no variance by definition and is reported as `0`, not `NaN`. Confidence intervals were considered but ruled out
 > for measuring fare variability — they describe uncertainty around the *mean* and shrink with
 > sample size (seat count), rather than describing the actual spread of fares, which is what
 > `FareStdDev`/`CoefficientVariation` capture directly.

@@ -7,6 +7,8 @@ import os
 import unicodedata
 # import numpy
 import pandas
+from br_economic_indicators import build_price_index, deflate_series
+from br_economic_indicators.data_sources import get_bcb_sgs_series, IPCA_MONTHLY_VARIATION
 
 class FilesProcessor:
     CANONICAL_COLUMNS = ["Year", "Month", "Airline", "OriginICAO", "DestinationICAO", "Fare", "Seats"]
@@ -116,9 +118,13 @@ class FilesProcessor:
         Returns the standard deviation of values weighted by weights, treating
         weights as frequency weights (e.g. Seats represents repeated observations
         of the same fare), using the unbiased frequency-weights estimator.
+        A single observation (total weight <= 1) has no variance, so it's defined as zero.
         """
+        total_weight = weights.sum()
+        if total_weight <= 1:
+            return 0.0
         average = FilesProcessor.weighted_average(values, weights)
-        variance = (weights * (values - average) ** 2).sum() / (weights.sum() - 1)
+        variance = (weights * (values - average) ** 2).sum() / (total_weight - 1)
         return variance ** 0.5
 
     def create_metrics_file(self, df, filename="fare_metrics_by_year.csv"):
@@ -138,32 +144,32 @@ class FilesProcessor:
         metrics.to_csv(path_to_file, index=False)
         return metrics
 
-    def read_ipca(self, path="ipca_historico.csv"):
-        """Reads the IPCA historical series and returns it as YearMonth + Index columns."""
-        ipca = pandas.read_csv(path, delimiter=';', encoding='utf-8')
-        ipca = ipca.rename(columns={
-            "Período": "YearMonth",
-            "Número Índice (Dez/93 = 100)": "IPCAIndex"
-        })
-        ipca["YearMonth"] = ipca["YearMonth"].astype(str).str[:4] + "-" + ipca["YearMonth"].astype(str).str[4:]
-        return ipca[["YearMonth", "IPCAIndex"]]
+    def read_ipca(self):
+        """Fetches the IPCA monthly variation series from the BCB SGS API and builds a
+        cumulative price index (via br_economic_indicators), indexed by date."""
+        monthly_variation = get_bcb_sgs_series(IPCA_MONTHLY_VARIATION)
+        return build_price_index(monthly_variation)
 
     def deflate_metrics(self, metrics, base_yearmonth=None, filename="fare_metrics_by_year_deflated.csv"):
         """
         Deflates WeightedAverageFare and FareStdDev to constant prices using the IPCA index,
         expressing every fare in terms of the purchasing power of base_yearmonth (defaults to
-        the most recent month present in metrics). FareStdDev is deflated by the same factor
-        as the average since it shares the same currency units; TotalSeats is left untouched.
+        the most recent month present in metrics). If base_yearmonth is more recent than the
+        latest published IPCA observation, the last available index value is held flat (via
+        Series.asof) instead of failing. FareStdDev is deflated by the same factor as the
+        average since it shares the same currency units; TotalSeats is left untouched.
         """
-        ipca = self.read_ipca()
+        price_index = self.read_ipca()
         if base_yearmonth is None:
             base_yearmonth = metrics["YearMonth"].max()
-        base_index = ipca.loc[ipca["YearMonth"] == base_yearmonth, "IPCAIndex"].iloc[0]
+        base_date = pandas.to_datetime(base_yearmonth)
 
-        metrics = metrics.merge(ipca, on="YearMonth", how="left")
-        deflation_factor = base_index / metrics["IPCAIndex"]
-        metrics["WeightedAverageFareReal"] = metrics["WeightedAverageFare"] * deflation_factor
-        metrics["FareStdDevReal"] = metrics["FareStdDev"] * deflation_factor
+        dates = pandas.to_datetime(metrics["YearMonth"])
+        fare_series = pandas.Series(metrics["WeightedAverageFare"].values, index=dates)
+        std_series = pandas.Series(metrics["FareStdDev"].values, index=dates)
+
+        metrics["WeightedAverageFareReal"] = deflate_series(fare_series, price_index, base_date).values
+        metrics["FareStdDevReal"] = deflate_series(std_series, price_index, base_date).values
 
         path_to_file = os.getcwd() + "/metrics_files/" + filename
         metrics.to_csv(path_to_file, index=False)

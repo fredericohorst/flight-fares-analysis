@@ -133,3 +133,5 @@ dmypy.json
 
 # anac files
 /csv_files_from_anac/*.csv
+graficos-texto1.ipynb
+TarifasAviao*.docx

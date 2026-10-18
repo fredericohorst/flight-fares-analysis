@@ -201,6 +201,12 @@ class FilesProcessor:
         df.to_csv(filename, index=False)
 
     def process_files(self):
+        """
+        returns df, metrics and route_variability dataframes
+        df = cleaned_airline_prices.csv
+        metrics = fare_metrics_by_year_deflated.csv
+        route_variability = route_fare_variability.csv
+        """
         df = self.read_files()
         df = self.clean_dataframe(df)
         df = self.route_agg_column(df)
